@@ -1,0 +1,14 @@
+version: '3.6'
+
+services:
+
+  nevelichki-streamlit:
+    container_name: nevelichki-streamlit
+    build: .
+    command: ["streamlit", "run", "app.py"]
+    volumes:
+      - .:/usr/src/app/
+    stdin_open: true
+    tty: true
+    ports:
+      - "8501:8501"
