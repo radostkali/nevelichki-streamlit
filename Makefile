@@ -2,6 +2,9 @@ start:
 	docker compose up -d --build
 
 up:
+	docker compose up
+
+up-d:
 	docker compose up -d
 
 stop:
