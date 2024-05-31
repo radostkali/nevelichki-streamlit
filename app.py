@@ -2,19 +2,21 @@ import streamlit as st
 import constants.common
 from character_creating_stages_menu import CharacterCreatingStagesMenu
 from daos.character_state_dao import CharacterStateDao
-from pages.page_renderer import BasePage, BasePageRenderer, PageRenderer
+from pages.page_renderer import BasePage, PageRenderer
 
 
 class HelloPage(BasePage):
 
     def render_content(self) -> None:
         st.title('НЕВЕЛИЧКИ & ВЕЛИЧКИ')
-        st.markdown('> *Приветствую тебя, ВЕЛИЧКА, на странице создания листа НЕВЕЛИЧКИ!*')
+        st.markdown(
+            '> <span style="color: #999999">Приветствую тебя, ВЕЛИЧКА, на странице создания листа НЕВЕЛИЧКИ!</span>',
+            unsafe_allow_html=True,
+        )
         st.markdown(
             'Первые шаги в жизни исследователя целого мира невеличек начинаются с простого вопроса...  '
-            '**А кто я?**'
+            '**А кто я?** Вопрос это обширный и включает в мире невеличек  следующие подпункты:'
         )
-        st.markdown('Вопрос это обширный и включает в мире невеличек  следующие подпункты:')
         st.markdown('#### 1. Выбор вида')
         st.markdown(
             'Мир невеличек как вы знаете населён множеством разумных маленьких животных у каждого из них свои '
@@ -39,9 +41,9 @@ class HelloPage(BasePage):
             'Возможно все, что у вас есть это фамильный перстень?'
         )
 
-        _, _, center, _, _ = st.columns(5)
+        _, center, _ = st.columns(3)
         with center:
-            if st.button(label='🐰 Создать'):
+            if st.button(label='🐰 Создать персонажа'):
                 st.switch_page(constants.common.PagesPath.SPECIES_SELECT)
 
         st.image(image='./images/main_cat.png')
@@ -49,7 +51,7 @@ class HelloPage(BasePage):
 
 PageRenderer(
     character_state_dao=CharacterStateDao(),
+    character_creating_stages_menu=CharacterCreatingStagesMenu(),
 ).render(
     page=HelloPage(),
 )
-CharacterCreatingStagesMenu().render()

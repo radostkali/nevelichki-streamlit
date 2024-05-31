@@ -4,7 +4,7 @@ import constants.common
 from character_creating_stages_menu import CharacterCreatingStagesMenu
 from daos import SpeciesDAO
 from daos.character_state_dao import CharacterStateDao
-from entities import SpeciesAbilitiesBonus, SpeciesAbilityBonus
+from entities import SpeciesAbilitiesBonus
 from pages.page_renderer import BasePage, PageRenderer
 
 
@@ -43,7 +43,7 @@ class SpeciesSelectPage(BasePage):
     def _render_species(self, species: constants.species.Species) -> None:
         species_entity = self._species_dao.get_species(species=species)
         st.markdown(f'#### {species_entity.name}')
-        st.markdown(species_entity.description, unsafe_allow_html=True)
+        st.markdown(f'<span style="color: #bcbcbc">{species_entity.description}</span>', unsafe_allow_html=True)
         st.markdown('##### 1. Увеличение характеристик')
         self._render_species_bonuses_select(species_abilities_bonuses=species_entity.species_abilities_bonuses)
         st.markdown('##### 2. Размер')
@@ -79,8 +79,9 @@ class SpeciesSelectPage(BasePage):
     def render_content(self) -> None:
         st.title('1. Выбор вида')
         st.markdown(
-            '> *Мир невеличек как вы знаете населён множеством разумных маленьких животных у '
-            'каждого из них свои особенности и сильные стороны.*'
+            '> <span style="color: #999999">Мир невеличек как вы знаете населён множеством разумных маленьких животных у '
+            'каждого из них свои особенности и сильные стороны.</span>',
+            unsafe_allow_html=True,
         )
         st.radio(
             label='Выберете вид невелички:',
@@ -102,5 +103,5 @@ page = SpeciesSelectPage(
 )
 PageRenderer(
     character_state_dao=CharacterStateDao(),
+    character_creating_stages_menu=CharacterCreatingStagesMenu(),
 ).render(page=page)
-CharacterCreatingStagesMenu().render()
