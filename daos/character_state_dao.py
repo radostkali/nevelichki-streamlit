@@ -26,8 +26,12 @@ class CharacterStateDao:
         if constants.common.STATE_KEY_CHARACTER not in st.session_state:
             self._set_state(character_state=CharacterStateEntity())
 
+    def get_character_state(self) -> CharacterStateEntity:
+        return self._get_character_state()
+
     def set_character_species(self, species: SpeciesEntity, species_ability_bonus: SpeciesAbilitiesBonus) -> None:
         character_state = self._get_character_state()
         character_state.species = species
         character_state.species_abilities_bonus = species_ability_bonus
+        character_state.creating_stages_done.add(constants.common.CharacterCreatingStage.SPECIES_SELECT)
         self._set_state(character_state=character_state)

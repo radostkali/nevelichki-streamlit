@@ -51,7 +51,9 @@ class HelloPage(BasePage):
 
 PageRenderer(
     character_state_dao=CharacterStateDao(),
-    character_creating_stages_menu=CharacterCreatingStagesMenu(),
+    character_creating_stages_menu=CharacterCreatingStagesMenu(
+        character_state_dao=CharacterStateDao(),
+    ),
 ).render(
     page=HelloPage(),
 )

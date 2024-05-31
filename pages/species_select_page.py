@@ -4,7 +4,7 @@ import constants.common
 from character_creating_stages_menu import CharacterCreatingStagesMenu
 from daos import SpeciesDAO
 from daos.character_state_dao import CharacterStateDao
-from entities import SpeciesAbilitiesBonus
+from entities import SpeciesAbilitiesBonus, SpeciesEntity
 from pages.page_renderer import BasePage, PageRenderer
 
 
@@ -15,6 +15,23 @@ class SpeciesSelectPage(BasePage):
     def __init__(self, species_dao: SpeciesDAO, character_state_dao: CharacterStateDao) -> None:
         self._species_dao = species_dao
         self._character_state_dao = character_state_dao
+
+    def _submit_species_selection(
+            self,
+            species_entity: SpeciesEntity,
+            species_ability_bonus: SpeciesAbilitiesBonus,
+    ) -> None:
+        character_state = self._character_state_dao.get_character_state()
+        if (
+            character_state.species != species_entity or
+            character_state.species_abilities_bonus != species_ability_bonus
+        ):
+            self._character_state_dao.set_character_species(
+                species=species_entity,
+                species_ability_bonus=species_ability_bonus,
+            )
+
+        st.switch_page(constants.common.PagesPath.CLASS_SELECT)
 
     def _render_additional_features(self, additional_features: list[str]) -> None:
         additional_features_strings = []
@@ -36,7 +53,7 @@ class SpeciesSelectPage(BasePage):
             label='Выберете бонус вида:',
             options=species_abilities_bonuses,
             key=self.SPECIES_ABILITIES_BONUS_KEY,
-            index=None,
+            # index=None,
             format_func=self._get_ability_bonus_string,
         )
 
@@ -58,25 +75,33 @@ class SpeciesSelectPage(BasePage):
         current_ability_bonus = st.session_state[self.SPECIES_ABILITIES_BONUS_KEY]
         is_ability_bonus_selected = current_ability_bonus is not None
 
-        _, _, center, _, _ = st.columns(5)
+        _, center, _ = st.columns(3)
         with center:
             if st.button(
-                label='Далее',
+                label='Подтвердить выбор',
                 help=None if is_ability_bonus_selected else 'Выберите бонус вида',
                 disabled=not is_ability_bonus_selected,
             ):
-                self._character_state_dao.set_character_species(
-                    species=species_entity,
+                self._submit_species_selection(
+                    species_entity=species_entity,
                     species_ability_bonus=current_ability_bonus,
                 )
-                st.switch_page(constants.common.PagesPath.SPECIES_SELECT)
 
         st.image(image=species_entity.image_path)
 
     def _on_species_select_callback(self) -> None:
         st.session_state[self.SPECIES_ABILITIES_BONUS_KEY] = None
 
+    def _init_state(self) -> None:
+        character_state = self._character_state_dao.get_character_state()
+        if constants.common.CharacterCreatingStage.SPECIES_SELECT in character_state.creating_stages_done:
+            if st.session_state.get(self.SPECIES_KEY) is None:
+                st.session_state[self.SPECIES_KEY] = str(character_state.species.key)
+                st.session_state[self.SPECIES_ABILITIES_BONUS_KEY] = character_state.species_abilities_bonus
+
     def render_content(self) -> None:
+        self._init_state()
+
         st.title('1. Выбор вида')
         st.markdown(
             '> <span style="color: #999999">Мир невеличек как вы знаете населён множеством разумных маленьких животных у '
@@ -88,7 +113,7 @@ class SpeciesSelectPage(BasePage):
             help='Нажмите на вид, чтобы ознакомится с его историей, особенностями и характеристиками.',
             options=[str(i) for i in constants.species.Species],
             key=self.SPECIES_KEY,
-            index=None,
+            # index=None,
             format_func=lambda option: constants.species.SPECIES_TO_NAME_MAP[option],
             on_change=self._on_species_select_callback,
         )
@@ -103,5 +128,7 @@ page = SpeciesSelectPage(
 )
 PageRenderer(
     character_state_dao=CharacterStateDao(),
-    character_creating_stages_menu=CharacterCreatingStagesMenu(),
+    character_creating_stages_menu=CharacterCreatingStagesMenu(
+        character_state_dao=CharacterStateDao(),
+    ),
 ).render(page=page)
