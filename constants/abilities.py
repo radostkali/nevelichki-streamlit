@@ -10,7 +10,7 @@ class Ability(StrEnum):
     CHARISMA = auto()
 
 
-ABILITIES_TO_NAME_MAP = {
+ABILITY_TO_NAME_MAP = {
     Ability.STRENGTH: 'Сила',
     Ability.DEXTERITY: 'Ловкость',
     Ability.CONSTITUTION: 'Телосложение',

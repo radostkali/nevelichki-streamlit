@@ -11,7 +11,7 @@ class SpeciesAbilityBonus:
 
     @property
     def name(self) -> str:
-        return constants.abilities.ABILITIES_TO_NAME_MAP[self.key]
+        return constants.abilities.ABILITY_TO_NAME_MAP[self.key]
 
 
 @dataclass(frozen=True, slots=True)
